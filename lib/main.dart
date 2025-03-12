@@ -1,10 +1,19 @@
-import 'package:flame/game.dart';
+import 'package:flappy_bird/features/start/start_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-void main() {
-  runApp(
-    GameWidget.controlled(
-      gameFactory: FlameGame.new,
-    ),
-  );
+
+Future<void> main() async {
+  runApp(GameApp());
+}
+
+class GameApp extends StatelessWidget {
+  const GameApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+      home: StartScreen(),
+    );
+  }
 }
