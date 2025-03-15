@@ -1,12 +1,24 @@
 import 'dart:async';
+import 'dart:math';
+import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flappy_bird/components/bird.dart';
 import 'package:flappy_bird/components/game_bounds.dart';
 import 'package:flappy_bird/components/pipe.dart';
 import 'dart:async' as dart_async;
 
-class FlappyGame extends Forge2DGame {
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+
+class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
   FlappyGame();
+  final random = Random();
+  int gapHeight = 10;
+  Bird bird = Bird();
+  int safetyBuffer = 20;
+  RxInt score = 0.obs;
+
 
   removeOutOfBoundsObstacles() {
     world.children.whereType<Pipe>().forEach((obstacle) {
@@ -16,18 +28,61 @@ class FlappyGame extends Forge2DGame {
     });
   }
 
+  createPipes() {
+    final worldRect = camera.visibleWorldRect;
+    double height = safetyBuffer + random.nextDouble() * (worldRect.bottom - worldRect.top - safetyBuffer * 2);
+    double heightTop = (height - gapHeight) / 2;
+    double heightBottom = (worldRect.height - height - gapHeight) / 2;
+    world.add(Pipe(heightTop, false));
+    world.add(Pipe(heightBottom, true));
+  }
+
+  gameOver() {
+    pauseEngine();
+    overlays.add("Results");
+  }
+
+  restart() {
+  world.children.whereType<Pipe>().toList().forEach(world.remove);
+  score.value = 0;
+
+  bird.reset(); 
+
+  resumeEngine();
+  overlays.remove('Results'); 
+  }
+
   @override
   FutureOr<void> onLoad() async {
     super.onLoad();
     world.add(GameBounds());
-    world.add(Bird());
-    world.add(Pipe(-24));
-    world.add(Pipe(24));
+    world.add(bird);
+        overlays.add("Score");
+    createPipes();
 
-      dart_async.Timer.periodic(const Duration(milliseconds: 2500), (timer) {
-
-      world.add(Pipe(-24));
-      world.add(Pipe(24));
+    dart_async.Timer.periodic(const Duration(milliseconds: 2500), (timer) {
+      createPipes();
+      score += 1;
     });
+  }
+
+  @override
+  void onTapDown(TapDownEvent event) {
+    bird.onTap();
+  }
+
+  @override
+  KeyEventResult onKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
+    final isKeyDown = event is KeyDownEvent;
+    final isSpace = keysPressed.contains(LogicalKeyboardKey.space);
+
+    if (isSpace && isKeyDown) {
+      bird.onTap();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
   }
 }

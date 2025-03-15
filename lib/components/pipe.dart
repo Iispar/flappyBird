@@ -6,20 +6,22 @@ class Pipe extends BodyComponent {
   final random = Random();
   final obstacleHeight = 25.0;
   final edgeBuffer = 2;
-  final double y;
+  final double height;
+  final bool bottom;
+  
 
-  Pipe(this.y);
+  Pipe(this.height, this.bottom);
 
   @override
   Body createBody() {
-    final halfObstacleHeight = obstacleHeight / 2;
     final worldRect = game.camera.visibleWorldRect;
 
     final topBodyDef = BodyDef(
-      position: Vector2(worldRect.right + edgeBuffer, y ),
+      position: Vector2(worldRect.right + edgeBuffer, bottom ? worldRect.bottom - height : worldRect.top + height),
       gravityOverride: Vector2.zero(),
       linearVelocity: Vector2(-10, 0),
       type: BodyType.dynamic,
+      fixedRotation: true,
       userData: this,
     );
     
@@ -27,7 +29,7 @@ class Pipe extends BodyComponent {
     final shape = PolygonShape()
       ..setAsBoxXY(
         2,
-        halfObstacleHeight,
+        height,
       );
 
     final body = world.createBody(topBodyDef);

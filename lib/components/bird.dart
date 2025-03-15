@@ -1,28 +1,31 @@
-import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flappy_bird/features/game/flappy_game_screen.dart';
 
-class Bird extends BodyComponent<FlappyGame> with TapCallbacks, ContactCallbacks {
+class Bird extends BodyComponent<FlappyGame> with ContactCallbacks {
   @override
   Body createBody() {
     final bodyDef = BodyDef(
-      position: Vector2(0, 0),
-      type: BodyType.dynamic,
-      userData: this,
-    );
+        position: Vector2(0, 0),
+        type: BodyType.dynamic,
+        userData: this,
+        gravityScale: Vector2(0, 6));
 
     final shape = PolygonShape()..setAsBoxXY(2.5, 2.5);
     final fixtureDef = FixtureDef(shape);
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 
-  @override
-  void onTapDown(TapDownEvent event) {
-    body.applyLinearImpulse(Vector2(0, -500));
+  void onTap() {
+    body.applyLinearImpulse(Vector2(0, -1000));
+  }
+
+  void reset() {
+    body.setTransform(Vector2(0, 0), 0);
+    body.linearVelocity = Vector2.zero();
   }
 
   @override
   void beginContact(Object other, Contact contact) {
-    print("U lost");
+    game.gameOver();
   }
 }
