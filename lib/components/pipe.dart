@@ -28,7 +28,7 @@ class Pipe extends BodyComponent {
 
     final shape = PolygonShape()
       ..setAsBoxXY(
-        2,
+        2.5,
         height,
       );
 
