@@ -19,7 +19,7 @@ class Pipe extends BodyComponent {
     final topBodyDef = BodyDef(
       position: Vector2(worldRect.right + edgeBuffer, bottom ? worldRect.bottom - height : worldRect.top + height),
       gravityOverride: Vector2.zero(),
-      linearVelocity: Vector2(-10, 0),
+      linearVelocity: Vector2(-20, 0),
       type: BodyType.dynamic,
       fixedRotation: true,
       userData: this,
