@@ -1,7 +1,9 @@
+import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flappy_bird/features/game/flappy_game_screen.dart';
 
 class Bird extends BodyComponent<FlappyGame> with ContactCallbacks {
+  
   @override
   Body createBody() {
     final bodyDef = BodyDef(
@@ -22,6 +24,8 @@ class Bird extends BodyComponent<FlappyGame> with ContactCallbacks {
   void reset() {
     body.setTransform(Vector2(0, 0), 0);
     body.linearVelocity = Vector2.zero();
+    body.angularVelocity = 0;
+    body.setFixedRotation(true);
   }
 
   @override

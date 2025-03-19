@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flappy_bird/components/background.dart';
 import 'package:flappy_bird/components/bird.dart';
 import 'package:flappy_bird/components/game_bounds.dart';
 import 'package:flappy_bird/components/pipe.dart';
@@ -12,13 +14,15 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
-  FlappyGame();
+  FlappyGame()
+      : super(
+          camera: CameraComponent.withFixedResolution(width: 800, height: 600),
+        );
   final random = Random();
   int gapHeight = 10;
   Bird bird = Bird();
   int safetyBuffer = 20;
   RxInt score = 0.obs;
-
 
   removeOutOfBoundsObstacles() {
     world.children.whereType<Pipe>().forEach((obstacle) {
@@ -30,7 +34,9 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
 
   createPipes() {
     final worldRect = camera.visibleWorldRect;
-    double height = safetyBuffer + random.nextDouble() * (worldRect.bottom - worldRect.top - safetyBuffer * 2);
+    double height = safetyBuffer +
+        random.nextDouble() *
+            (worldRect.bottom - worldRect.top - safetyBuffer * 2);
     double heightTop = (height - gapHeight) / 2;
     double heightBottom = (worldRect.height - height - gapHeight) / 2;
     world.add(Pipe(heightTop, false));
@@ -43,21 +49,25 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
   }
 
   restart() {
-  world.children.whereType<Pipe>().toList().forEach(world.remove);
-  score.value = 0;
+    world.children.whereType<Pipe>().toList().forEach(world.remove);
+    score.value = 0;
 
-  bird.reset(); 
+    bird.reset();
 
-  resumeEngine();
-  overlays.remove('Results'); 
+    resumeEngine();
+    overlays.remove('Results');
   }
 
   @override
   FutureOr<void> onLoad() async {
     super.onLoad();
+
+    final backgroundImage = await images.load('background.png');
+    await world.add(Background(sprite: Sprite(backgroundImage)));
+
     world.add(GameBounds());
     world.add(bird);
-        overlays.add("Score");
+    overlays.add("Score");
     createPipes();
 
     dart_async.Timer.periodic(const Duration(milliseconds: 2500), (timer) {
