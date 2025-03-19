@@ -16,13 +16,15 @@ import 'package:get/get.dart';
 class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
   FlappyGame()
       : super(
-          camera: CameraComponent.withFixedResolution(width: 800, height: 600),
-        );
+            camera:
+                CameraComponent.withFixedResolution(width: 800, height: 800));
   final random = Random();
   int gapHeight = 10;
   Bird bird = Bird();
   int safetyBuffer = 20;
-  RxInt score = 0.obs;
+  RxInt score = (-2).obs;
+  RxBool gameActive = false.obs;
+  RxBool resultsActive = false.obs;
 
   removeOutOfBoundsObstacles() {
     world.children.whereType<Pipe>().forEach((obstacle) {
@@ -44,13 +46,17 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
   }
 
   gameOver() {
+    resultsActive.value = true;
     pauseEngine();
     overlays.add("Results");
   }
 
   restart() {
+    if (gameActive.value) gameActive.value = false;
+    resultsActive.value = false;
+    world.gravity = Vector2(0, 0);
     world.children.whereType<Pipe>().toList().forEach(world.remove);
-    score.value = 0;
+    score.value = -2;
 
     bird.reset();
 
@@ -65,20 +71,28 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
     final backgroundImage = await images.load('background.png');
     await world.add(Background(sprite: Sprite(backgroundImage)));
 
+    world.gravity = Vector2(0, 0);
     world.add(GameBounds());
     world.add(bird);
     overlays.add("Score");
-    createPipes();
 
-    dart_async.Timer.periodic(const Duration(milliseconds: 2500), (timer) {
-      createPipes();
-      score += 1;
+    dart_async.Timer.periodic(const Duration(milliseconds: 2000), (timer) {
+      if (gameActive.value && !resultsActive.value) {
+        createPipes();
+        score += 1;
+      }
     });
   }
 
   @override
   void onTapDown(TapDownEvent event) {
+    if (!gameActive.value) startGame();
     bird.onTap();
+  }
+
+  void startGame() {
+    world.gravity = Vector2(0, 160);
+    gameActive.value = true;
   }
 
   @override
@@ -90,6 +104,7 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
     final isSpace = keysPressed.contains(LogicalKeyboardKey.space);
 
     if (isSpace && isKeyDown) {
+      if (!gameActive.value) startGame();
       bird.onTap();
       return KeyEventResult.handled;
     }
