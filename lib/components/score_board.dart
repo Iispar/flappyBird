@@ -10,6 +10,6 @@ class ScoreBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Text("${Math.max(game.score.value, 0)}"));
+    return Obx(() => Text("${game.score}"));
   }
 }
