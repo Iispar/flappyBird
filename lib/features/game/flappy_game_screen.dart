@@ -7,6 +7,7 @@ import 'package:flappy_bird/components/background.dart';
 import 'package:flappy_bird/components/bird.dart';
 import 'package:flappy_bird/components/game_bounds.dart';
 import 'package:flappy_bird/components/pipe.dart';
+import 'package:flappy_bird/components/score_flag.dart';
 import 'dart:async' as dart_async;
 
 import 'package:flutter/material.dart';
@@ -19,15 +20,26 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
             camera:
                 CameraComponent.withFixedResolution(width: 800, height: 600));
   final random = Random();
-  int gapHeight = 10;
+  int gapHeight = 8;
   Bird bird = Bird();
   int safetyBuffer = 20;
   RxInt score = 0.obs;
   RxBool gameActive = false.obs;
   RxBool resultsActive = false.obs;
 
+  int categoryBird = 0x0001;
+  int categoryPipe = 0x0002;
+  int categoryBackground = 0x0004;
+  int categoryScore = 0x0008;
+
   removeOutOfBoundsObstacles() {
     world.children.whereType<Pipe>().forEach((obstacle) {
+      if (obstacle.body.position.x < camera.visibleWorldRect.left) {
+        world.remove(obstacle);
+      }
+    });
+
+    world.children.whereType<ScoreFlag>().forEach((obstacle) {
       if (obstacle.body.position.x < camera.visibleWorldRect.left) {
         world.remove(obstacle);
       }
@@ -43,6 +55,8 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
     double heightBottom = (worldRect.height - height - gapHeight) / 2;
     world.add(Pipe(heightTop, false));
     world.add(Pipe(heightBottom, true));
+
+    world.add(ScoreFlag(worldRect.height));
   }
 
   gameOver() {
@@ -56,6 +70,7 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
     resultsActive.value = false;
     world.gravity = Vector2(0, 0);
     world.children.whereType<Pipe>().toList().forEach(world.remove);
+    world.children.whereType<ScoreFlag>().toList().forEach(world.remove);
     score.value = 0;
 
     bird.reset();
@@ -79,7 +94,6 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
     dart_async.Timer.periodic(const Duration(milliseconds: 2000), (timer) {
       if (gameActive.value && !resultsActive.value) {
         createPipes();
-        score += 1;
       }
     });
   }

@@ -1,7 +1,8 @@
 import 'package:flame/extensions.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flappy_bird/features/game/flappy_game_screen.dart';
 
-class GameBounds extends BodyComponent {
+class GameBounds extends BodyComponent<FlappyGame> {
   @override
   Body createBody() {
     final bodyDef = BodyDef(
@@ -27,7 +28,10 @@ class GameBounds extends BodyComponent {
             gameBoundsVectors[i],
             gameBoundsVectors[(i + 1) % gameBoundsVectors.length],
           ),
-      ));
+      )
+      ..filter.categoryBits = game.categoryBackground
+      ..filter.maskBits = game.categoryBird
+      );
     }
 
     return gameBoundsBody;

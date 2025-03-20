@@ -21,7 +21,10 @@ class Bird extends BodyComponent<FlappyGame> with ContactCallbacks {
     renderBody = false;
     final shape = PolygonShape()..setAsBoxXY(2.5, 2.5);
 
-    final fixtureDef = FixtureDef(shape);
+    final fixtureDef = FixtureDef(shape)
+      ..filter.categoryBits = game.categoryBird
+      ..filter.maskBits =
+          game.categoryPipe | game.categoryBackground | game.categoryScore;
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 
@@ -37,7 +40,11 @@ class Bird extends BodyComponent<FlappyGame> with ContactCallbacks {
 
   @override
   void beginContact(Object other, Contact contact) {
-    game.gameOver();
+    if (!contact.fixtureB.isSensor) {
+      game.gameOver();
+    } else {
+      game.score += 1;
+    }
   }
 
   @override
@@ -62,6 +69,12 @@ class Bird extends BodyComponent<FlappyGame> with ContactCallbacks {
       double offsetY = sin(elapsedTime * speed) * amplitude;
       body.setTransform(
           Vector2(initialPosition.x, initialPosition.y + offsetY), body.angle);
+    } else {
+      if (body.linearVelocity[1] > 50) {
+        body.setTransform(body.position, 0.6);
+      } else {
+        body.setTransform(body.position, -0.6);
+      }
     }
   }
 }

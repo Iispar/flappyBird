@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flappy_bird/features/game/flappy_game_screen.dart';
 
-class Pipe extends BodyComponent {
+class Pipe extends BodyComponent<FlappyGame> {
   final random = Random();
   final obstacleHeight = 25.0;
   final edgeBuffer = 2;
@@ -30,7 +31,7 @@ class Pipe extends BodyComponent {
 
     final topBodyDef = BodyDef(
       position: Vector2(worldRect.right + edgeBuffer,
-          bottom ? worldRect.bottom - height : worldRect.top + height),
+          bottom ? worldRect.bottom - height + 1 : worldRect.top + height - 1),
       gravityOverride: Vector2.zero(),
       linearVelocity: Vector2(-20, 0),
       type: BodyType.dynamic,
@@ -46,7 +47,9 @@ class Pipe extends BodyComponent {
       );
 
     final body = world.createBody(topBodyDef);
-    body.createFixture(FixtureDef(shape));
+    body.createFixture(FixtureDef(shape)
+      ..filter.categoryBits = game.categoryPipe
+      ..filter.maskBits = game.categoryBird);
 
     return body;
   }
