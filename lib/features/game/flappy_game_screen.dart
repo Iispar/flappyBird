@@ -17,12 +17,12 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
   FlappyGame()
       : super(
             camera:
-                CameraComponent.withFixedResolution(width: 800, height: 800));
+                CameraComponent.withFixedResolution(width: 800, height: 600));
   final random = Random();
   int gapHeight = 10;
   Bird bird = Bird();
   int safetyBuffer = 20;
-  RxInt score = (-2).obs;
+  RxInt score = 0.obs;
   RxBool gameActive = false.obs;
   RxBool resultsActive = false.obs;
 
@@ -56,7 +56,7 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
     resultsActive.value = false;
     world.gravity = Vector2(0, 0);
     world.children.whereType<Pipe>().toList().forEach(world.remove);
-    score.value = -2;
+    score.value = 0;
 
     bird.reset();
 
