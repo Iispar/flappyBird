@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flappy_bird/features/game/flappy_game_screen.dart';
 
@@ -31,6 +32,7 @@ class Bird extends BodyComponent<FlappyGame> with ContactCallbacks {
   void onTap() {
     body.linearVelocity = Vector2.zero();
     body.applyLinearImpulse(Vector2(0, -1200));
+    FlameAudio.play('flap.mp3');
   }
 
   void reset() {
@@ -43,7 +45,7 @@ class Bird extends BodyComponent<FlappyGame> with ContactCallbacks {
     if (!contact.fixtureB.isSensor) {
       game.gameOver();
     } else {
-      game.score += 1;
+      game.incrementScore();
     }
   }
 

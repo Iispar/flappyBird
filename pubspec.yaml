@@ -13,7 +13,7 @@ dependencies:
   flame: ^1.26.0
   flame_forge2d: ^0.18.2+7
   get: ^4.7.2
-
+  flame_audio: ^2.0.5
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -24,3 +24,4 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/audio/

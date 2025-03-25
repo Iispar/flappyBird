@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flappy_bird/components/background.dart';
 import 'package:flappy_bird/components/bird.dart';
@@ -57,6 +58,11 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
     world.add(Pipe(heightBottom, true));
 
     world.add(ScoreFlag(worldRect.height));
+  }
+
+  incrementScore() {
+    score += 1;
+    FlameAudio.play('score.mp3');
   }
 
   gameOver() {
