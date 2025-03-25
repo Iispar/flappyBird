@@ -118,6 +118,10 @@ class FlappyGame extends Forge2DGame with TapCallbacks, KeyboardEvents {
     final isSpace = keysPressed.contains(LogicalKeyboardKey.space);
 
     if (isSpace && isKeyDown) {
+      if (resultsActive.value) {
+        restart();
+        return KeyEventResult.handled;
+      } 
       if (!gameActive.value) startGame();
       bird.onTap();
       return KeyEventResult.handled;
