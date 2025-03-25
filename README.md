@@ -12,3 +12,5 @@ Lastly Nelli finished with score board visuals.
 
 As the two modalities for input this game supports keyboard and mouse and for output graphics and audio effects. <br />
 Once you click 'start game' or press any button on the welcome page, it moves to the game and the bird starts flapping by pressing space or clicking with a mouse.
+
+The url for this repository is https://github.com/Iispar/flappyBird
